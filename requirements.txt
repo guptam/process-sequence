@@ -2,3 +2,4 @@ keras==1.2
 unicodecsv
 h5py
 distance
+jellyfish
