@@ -29,7 +29,8 @@ project
 ```
 ### Reference
 
-To run the code of [reference model](https://github.com/verenich/ProcessSequencePrediction):
+The code of [reference model](https://github.com/verenich/ProcessSequencePrediction) was implemented in Python 2.7. To run:
+
 1. Install requirement
 
 ```pip install -r requirements.txt```
@@ -42,6 +43,6 @@ To run the code of [reference model](https://github.com/verenich/ProcessSequence
 
 ```mkdir code/output_files/results```
 
-3. Run ```train.py```
-4. Run ```evaluate_next_activity_and_time.py``` and ```evaluate_suffix_and_remaining_time.py```
-5. Run ```calculate_accuracy_on_next_event.py```
+3. Run ```python train.py```
+4. Run ```python evaluate_next_activity_and_time.py``` and ```python evaluate_suffix_and_remaining_time.py```
+5. Run ```python calculate_accuracy_on_next_event.py```
