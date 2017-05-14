@@ -18,7 +18,6 @@ project
 | 
 └───data
 |   │   helpdesk.csv: full data for analysis
-|   │   helpdesk_copy.csv: small data for checking
 |
 └───experiment
 |   |   create_df.ipynb
