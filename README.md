@@ -1,5 +1,6 @@
 # Process Sequence
-Directory structure:
+
+### Directory structure:
 
 ```
 project
@@ -27,6 +28,7 @@ project
 |
 └───reference
 ```
+### Reference
 
 To run the code of [reference model](https://github.com/verenich/ProcessSequencePrediction):
 1. Install requirement
