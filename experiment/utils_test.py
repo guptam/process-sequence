@@ -163,7 +163,9 @@ def getLabel(prediction, targetchartoindice):
 
 def inverseTime(predictions, divisor):
     pred_t = predictions*divisor
-    return np.maximum(pred_t, 0)
+    pred_t = np.maximum(pred_t, 0)
+    pred_t = pred_t.reshape([pred_t.shape[0],]).tolist()
+    return pred_t
 
 
 def get_top3_accuracy(probabilities_array, actual_labels, targetchartoindice):
