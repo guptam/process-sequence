@@ -149,7 +149,7 @@ def one_hot_encode(groupByCase, targetchartoindice):
                 y_a[i, targetchartoindice[c]] = 1
     return y_a
 
-def nomalize(groupByCase, divisor):
+def normalize(groupByCase, divisor):
     next_chars_t = getOutput(groupByCase)[1]
     y_t = np.asarray(next_chars_t)
     return y_t/divisor
