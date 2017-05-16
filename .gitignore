@@ -1,2 +1,3 @@
-.ipynb_checkpoints
-experiment/.ipynb_checkpoints
+experiment/.pyc
+experiment_1/*.pyc
+experiment_2/*.pyc
