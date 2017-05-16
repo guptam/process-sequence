@@ -150,3 +150,37 @@ def one_hot_encode(next_chars, targetchartoindice):
 def normalize(next_chars_t, divisor):
     y_t = np.asarray(next_chars_t)
     return y_t/divisor
+
+def getLabel(prediction, targetchartoindice):
+    indicetotargetchar = dict((indice, char) for char, indice in targetchartoindice.items())
+    label_list = []
+    for i in range(prediction.shape[0]):
+        max_value_index = np.argmax(prediction[i])
+        label = indicetotargetchar[max_value_index]
+        label_list.append(label)
+    return label_list
+
+
+def inverseTime(predictions, divisor):
+    pred_t = predictions*divisor
+    return np.maximum(pred_t, 0)
+
+
+def get_top3_accuracy(probabilities_array, actual_labels, targetchartoindice):
+    match = 0.0
+    total = len(actual_labels)
+    for i in range(len(probabilities_array)):
+        current_probabilites = probabilities_array[i]
+        top_pred_labels = get_top3_labels(current_probabilites, targetchartoindice) 
+        if actual_labels[i] in top_pred_labels:
+            match +=1
+    return match/total
+
+def get_top3_labels(current_probabilites, targetchartoindice):
+    labels = []
+    indicetotargetchar = dict((indice, char) for char, indice in targetchartoindice.items())
+    top_3_index = np.argpartition(-current_probabilites, 3)[:3]
+    for i in range(len(top_3_index)):
+        pred_label = indicetotargetchar[top_3_index[i]]
+        labels.append(pred_label)
+    return labels
