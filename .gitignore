@@ -1,3 +1,2 @@
 experiment/.pyc
-experiment_1/*.pyc
-experiment_2/*.pyc
+experiment_*/*.pyc
