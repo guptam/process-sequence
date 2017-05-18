@@ -1,2 +1,3 @@
 experiment/.pyc
 experiment_*/*.pyc
+experiment_*/output_files/models/*
