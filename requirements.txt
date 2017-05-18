@@ -3,3 +3,4 @@ unicodecsv
 h5py
 distance
 jellyfish
+mkl-service
