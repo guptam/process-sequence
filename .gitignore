@@ -1,3 +1,5 @@
+__pycache__
 experiment/.pyc
+input/*
 */*.pyc
-*/output_files/models/*
+*/otput_files/models/*
