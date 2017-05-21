@@ -1,0 +1,6 @@
+keras==2.0.4
+unicodecsv
+h5py
+distance
+jellyfish
+mkl-service
