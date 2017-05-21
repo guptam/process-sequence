@@ -186,3 +186,19 @@ def get_top3_labels(current_probabilites, targetchartoindice):
         pred_label = indicetotargetchar[top_3_index[i]]
         labels.append(pred_label)
     return labels
+
+def getRemaingTrace(true_labels, pred_probabilities, targetchartoindice):
+    pred_labels = getLabel(pred_probabilities, targetchartoindice)
+    lst_true = []
+    temp_list_true = []
+    lst_pred = []
+    temp_list_pred = []
+    for i in range(len(true_labels)):
+        temp_list_true.append(true_labels[i])
+        temp_list_pred.append(pred_labels[i])
+        if true_labels[i] == 'EOS':
+            lst_true.append(temp_list_true)
+            lst_pred.append(temp_list_pred)
+            temp_list_true = []
+            temp_list_pred = []
+    return lst_true, lst_pred
