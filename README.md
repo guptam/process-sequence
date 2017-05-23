@@ -5,8 +5,10 @@
 ```
 project
 │   README.md
-│   requirement.txt    
+│   requirement.txt: to run experiment in python 2.7
+|   requirement2.txt: to run in python 3.5   
 │   report.pptx
+|   performance. xlsx
 |
 └───code: code of reference 
 │   │   train.py
@@ -23,7 +25,15 @@ project
 |   |   create_df.ipynb
 |   |   prepare_data.ipynb
 |
+└───data_preprocessing
+|   |   create_df.ipynb
+|   |   prepare_input.ipynb
+|
 └───input
+|
+└───experiment
+|
+└───benchmark
 |
 └───reference
 ```
