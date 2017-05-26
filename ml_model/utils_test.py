@@ -33,7 +33,7 @@ def char_indice_dict(char_list):
     return chartoindice
 
 def getList(df):
-    '''This function takes a pandas series as an input and returns a sequence of elements of that series'''
+    '''This function takes a pandas series as an input and returns a list of sub elements of that series in order'''
     temp = []
     lst = df.tolist()
     for i in range(1, len(lst)+1):
@@ -42,7 +42,7 @@ def getList(df):
     return temp
 
 def getFeature(groupByCase):
-    '''This function returns a sequence of all cases'''
+    '''This function returns a sequence of all features'''
     sentences = []      #activity
     sentences_t = []    #duration
     sentences_t2 =[]    #cum duration
@@ -91,7 +91,7 @@ def vectorizeInput(sentences, sentences_t, sentences_t2, sentences_t3, sentences
     return X
 
 def getNextActivity(df):
-    '''This is used to get next activity'''
+    '''This functions returns a sequence of the next activity (activity output)'''
     temp = []
     lst = df.tolist()
     for i in range(1, len(df)):
@@ -101,7 +101,7 @@ def getNextActivity(df):
     return temp
 
 def getNextTime(df):
-    '''This is used to get next time'''
+    '''This functions returns a sequence of the next duration (time output)'''
     temp = []
     lst = df.tolist()
     for i in range(1, len(df)):
@@ -148,10 +148,12 @@ def one_hot_encode(next_chars, targetchartoindice):
     return y_a
 
 def normalize(next_chars_t, divisor):
+    '''This function returns a normalized y_t'''
     y_t = np.asarray(next_chars_t)
     return y_t/divisor
 
 def getLabel(prediction, targetchartoindice):
+    '''This function returns the label of one-hot encoded y_a'''
     indicetotargetchar = dict((indice, char) for char, indice in targetchartoindice.items())
     label_list = []
     for i in range(prediction.shape[0]):
@@ -162,6 +164,7 @@ def getLabel(prediction, targetchartoindice):
 
 
 def inverseTime(predictions, divisor):
+    '''This function returns y_t from a normalized y_t'''
     pred_t = predictions*divisor
     pred_t = np.maximum(pred_t, 0)
     pred_t = pred_t.reshape([pred_t.shape[0],]).tolist()
@@ -169,6 +172,7 @@ def inverseTime(predictions, divisor):
 
 
 def get_top3_accuracy(probabilities_array, actual_labels, targetchartoindice):
+    '''This function returns top-3 accuracy for activity prediction'''
     match = 0.0
     total = len(actual_labels)
     for i in range(len(probabilities_array)):
@@ -179,6 +183,7 @@ def get_top3_accuracy(probabilities_array, actual_labels, targetchartoindice):
     return match/total
 
 def get_top3_labels(current_probabilites, targetchartoindice):
+    '''This function returns top-3 labels for activity prediction and used for get_top3_accuracy function'''
     labels = []
     indicetotargetchar = dict((indice, char) for char, indice in targetchartoindice.items())
     top_3_index = np.argpartition(-current_probabilites, 3)[:3]
@@ -187,6 +192,7 @@ def get_top3_labels(current_probabilites, targetchartoindice):
         labels.append(pred_label)
     return labels
 
+'''
 def getRemaingTrace(true_labels, pred_probabilities, targetchartoindice):
     pred_labels = getLabel(pred_probabilities, targetchartoindice)
     lst_true = []
@@ -202,3 +208,4 @@ def getRemaingTrace(true_labels, pred_probabilities, targetchartoindice):
             temp_list_true = []
             temp_list_pred = []
     return lst_true, lst_pred
+'''
