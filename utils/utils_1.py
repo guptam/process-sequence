@@ -33,7 +33,7 @@ def char_indice_dict(char_list):
     return chartoindice
 
 def getList(df):
-    '''This function takes a pandas series as an input and returns a sequence of elements of that series'''
+    '''This function takes a pandas series as an input and returns a list of sub elements of that series in order'''
     temp = []
     lst = df.tolist()
     for i in range(1, len(lst)+1):
@@ -42,7 +42,7 @@ def getList(df):
     return temp
 
 def getFeature(groupByCase):
-    '''This function returns a sequence of all cases'''
+    '''This function returns a sequence of all features'''
     sentences = []      #activity
     sentences_t = []    #duration
     sentences_t2 =[]    #cum duration
@@ -66,9 +66,8 @@ def getFeature(groupByCase):
     return sentences, sentences_t, sentences_t2, sentences_t3, sentences_t4
 
 
-def vectorizeInput(groupByCase, maxlen, num_features, chartoindice, divisor, divisor2, divisor3=86400, divisor4=7):
+def vectorizeInput(sentences, sentences_t, sentences_t2, sentences_t3, sentences_t4, maxlen, num_features, chartoindice, divisor, divisor2, divisor3=86400, divisor4=7):
     '''This function returns a vectorized input'''
-    sentences, sentences_t, sentences_t2, sentences_t3, sentences_t4 = getFeature(groupByCase)
     X = np.zeros((len(sentences), maxlen, num_features), dtype=np.float32)
     for i, sentence in enumerate(sentences):
         leftpad = maxlen-len(sentence)
@@ -87,12 +86,13 @@ def vectorizeInput(groupByCase, maxlen, num_features, chartoindice, divisor, div
             X[i, t+leftpad, len(unique_chars)] = t+1
             X[i, t+leftpad, len(unique_chars)+1] = sentence_t[t]/divisor
             X[i, t+leftpad, len(unique_chars)+2] = sentence_t2[t]/divisor2
-            X[i, t+leftpad, len(unique_chars)+3] = sentence_t3[t]/divisor3
-            X[i, t+leftpad, len(unique_chars)+4] = sentence_t4[t]/divisor4
+            X[i, t+leftpad, len(unique_chars)+3] = sentence_t3[t]/86400
+            #fill weekday
+            X[i, t+leftpad, len(unique_chars)+3+int(sentence_t4[t])] = 1
     return X
 
 def getNextActivity(df):
-    '''This is used to get next activity'''
+    '''This functions returns a sequence of the next activity (activity output)'''
     temp = []
     lst = df.tolist()
     for i in range(1, len(df)):
@@ -102,7 +102,7 @@ def getNextActivity(df):
     return temp
 
 def getNextTime(df):
-    '''This is used to get next time'''
+    '''This functions returns a sequence of the next duration (time output)'''
     temp = []
     lst = df.tolist()
     for i in range(1, len(df)):
@@ -137,9 +137,8 @@ def getOutput(groupByCase):
     return next_chars, next_chars_t, next_chars_t2, next_chars_t3, next_chars_t4
 
 
-def one_hot_encode(groupByCase, targetchartoindice):
+def one_hot_encode(next_chars, targetchartoindice):
     '''This function returns a one-hot-encoded y_a'''
-    next_chars = getOutput(groupByCase)[0]
     target_chars = targetchartoindice.keys()
 
     y_a = np.zeros((len(next_chars), len(target_chars)), dtype=np.float32)
@@ -149,30 +148,65 @@ def one_hot_encode(groupByCase, targetchartoindice):
                 y_a[i, targetchartoindice[c]] = 1
     return y_a
 
-def normalize(groupByCase, divisor):
-    next_chars_t = getOutput(groupByCase)[1]
+def normalize(next_chars_t, divisor):
+    '''This function returns a normalized y_t'''
     y_t = np.asarray(next_chars_t)
     return y_t/divisor
+
+def getLabel(prediction, targetchartoindice):
+    '''This function returns the label of one-hot encoded y_a'''
+    indicetotargetchar = dict((indice, char) for char, indice in targetchartoindice.items())
+    label_list = []
+    for i in range(prediction.shape[0]):
+        max_value_index = np.argmax(prediction[i])
+        label = indicetotargetchar[max_value_index]
+        label_list.append(label)
+    return label_list
+
+
+def inverseTime(predictions, divisor):
+    '''This function returns y_t from a normalized y_t'''
+    pred_t = predictions*divisor
+    pred_t = np.maximum(pred_t, 0)
+    pred_t = pred_t.reshape([pred_t.shape[0],]).tolist()
+    return pred_t
+
+
+def get_top3_accuracy(probabilities_array, actual_labels, targetchartoindice):
+    '''This function returns top-3 accuracy for activity prediction'''
+    match = 0.0
+    total = len(actual_labels)
+    for i in range(len(probabilities_array)):
+        current_probabilites = probabilities_array[i]
+        top_pred_labels = get_top3_labels(current_probabilites, targetchartoindice) 
+        if actual_labels[i] in top_pred_labels:
+            match +=1
+    return match/total
+
+def get_top3_labels(current_probabilites, targetchartoindice):
+    '''This function returns top-3 labels for activity prediction and used for get_top3_accuracy function'''
+    labels = []
+    indicetotargetchar = dict((indice, char) for char, indice in targetchartoindice.items())
+    top_3_index = np.argpartition(-current_probabilites, 3)[:3]
+    for i in range(len(top_3_index)):
+        pred_label = indicetotargetchar[top_3_index[i]]
+        labels.append(pred_label)
+    return labels
+
 '''
-# new next_chars
-next_chars_indice = [targetchartoindice[act] for act in next_chars]
-# reshape for OHC without warning
-next_chars_indice = np.asarray(next_chars_indice).reshape(-1,1)
-
-next_chars_indice[:10]
-
-encoder = OneHotEncoder()
-data_feature_one_hot_encoded = encoder.fit_transform(next_chars_indice)
-
-y_a = data_feature_one_hot_encoded.toarray()
-y_a
-
-#y_a.shape (13710, 9)
-'''
-
-'''
-next_chars_t = next_chars_t.reshape(-1, 1)
-scaler = StandardScaler().fit(next_chars_t)
-y_t = scaler.transform(next_chars_t) 
-y_t = y_t.reshape([13710,])
+def getRemaingTrace(true_labels, pred_probabilities, targetchartoindice):
+    pred_labels = getLabel(pred_probabilities, targetchartoindice)
+    lst_true = []
+    temp_list_true = []
+    lst_pred = []
+    temp_list_pred = []
+    for i in range(len(true_labels)):
+        temp_list_true.append(true_labels[i])
+        temp_list_pred.append(pred_labels[i])
+        if true_labels[i] == 'EOS':
+            lst_true.append(temp_list_true)
+            lst_pred.append(temp_list_pred)
+            temp_list_true = []
+            temp_list_pred = []
+    return lst_true, lst_pred
 '''
