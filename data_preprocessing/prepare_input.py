@@ -6,7 +6,8 @@ import pickle
 import sys
 
 sys.path.insert(0, './../utils/')
-from utils import *
+
+from utils_2 import * #remember to change this one!!!!!
 
 #----------------Load data---------------------
 print('Loading data...')
@@ -15,7 +16,7 @@ name = 'helpdesk'
 parser = {
     'datafile': name + '.csv',
     'inputdir': './../input/{}/'.format(name),   
-    'utils': 'utils_1'
+    'utils': 'utils_2'
 }
 
 dirs = argparse.Namespace(**parser)
@@ -45,10 +46,15 @@ print('Length of longest case: {}'.format(maxlen))
 # define number of features
 if dirs.utils == 'utils':
     features = ['number_of_past_activitiy', 'duration', 'cumduration', 'time_from_midnight', 'day_of_week']
-else:
+elif dirs.utils == 'utils_1':
     features = ['number_of_past_activitiy', 'duration', 'cumduration', 'time_from_midnight', 
               'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun']
+else:
+    features=['number_of_past_activitiy', 'duration', 'time_from_midnight', 
+              'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun']
 num_features = len(data['ActivityID'].unique()) + len(features)
+print('Use utility function: {}'.format(dirs.utils))
+print('Features: {}'.format(features))
 print('Number of features: {}'.format(num_features))
 
 # mapping dict

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-'''Weekday as categorical variable'''
+'''NO cumduration'''
 
 def transformDf(data):
     '''This function returns a dataframe with the type of activity is a string and the other are float'''
@@ -49,6 +49,12 @@ def getFeature(groupByCase):
     sentences_t2 =[]    #cum duration
     sentences_t3 = []   #time since midnight
     sentences_t4 = []   #weekday
+    MA_1 = []
+    MA_2 = [] 
+    MA_3 = [] 
+    MA_4 = []   
+    MA_5 = []
+    MA_6 = []
     for case, group in groupByCase:
         case_sentences = getList(group['ActivityID'])
         sentences += case_sentences
@@ -64,10 +70,31 @@ def getFeature(groupByCase):
     
         case_sentences_t4 = getList(group['WeekDay'])
         sentences_t4 += case_sentences_t4
-    return sentences, sentences_t, sentences_t2, sentences_t3, sentences_t4
+
+        case_MA_1 = getList(group['SMA_16'])
+        MA_1 += case_MA_1
+
+        case_MA_2 = getList(group['STD_16'])
+        MA_2 += case_MA_2
+
+        case_MA_3 = getList(group['Band_value_16'])
+        MA_3 += case_MA_3
+
+        #case_MA_4 = getList(group['Momentum'])
+        #MA_4 += case_MA_4
+
+        case_MA_4 = getList(group['RSI'])
+        MA_4 += case_MA_4
+
+        case_MA_5 = getList(group['Williams'])
+        MA_5 += case_MA_5
+
+        case_MA_6 = getList(group['MACD'])
+        MA_6 += case_MA_6
+    return sentences, sentences_t, sentences_t2, sentences_t3, sentences_t4, MA_1, MA_2, MA_3, MA_4, MA_5, MA_6
 
 
-def vectorizeInput(sentences, sentences_t, sentences_t2, sentences_t3, sentences_t4, maxlen, num_features, chartoindice, divisor, divisor2, divisor3=86400, divisor4=7):
+def vectorizeInput(sentences, sentences_t, sentences_t2, sentences_t3, sentences_t4, MA_1, MA_2, MA_3, MA_4, MA_5, MA_6, maxlen, num_features, chartoindice, divisor, divisor2, divisor3, divisor4, di1, di2, di3, di4, di5, di6):
     '''This function returns a vectorized input'''
     X = np.zeros((len(sentences), maxlen, num_features), dtype=np.float32)
     for i, sentence in enumerate(sentences):
@@ -77,6 +104,13 @@ def vectorizeInput(sentences, sentences_t, sentences_t2, sentences_t3, sentences
         sentence_t2 = sentences_t2[i]
         sentence_t3 = sentences_t3[i]
         sentence_t4 = sentences_t4[i]
+
+        case_MA_1 = MA_1[i]/di1
+        case_MA_2 = MA_2[i]/di2
+        case_MA_3 = MA_3[i]/di3
+        case_MA_4 = MA_4[i]/di4
+        case_MA_5 = MA_5[i]/di5
+        case_MA_6 = MA_6[i]/di6
         for t, char in enumerate(sentence):
             #fill activity
             for c in unique_chars:
@@ -86,10 +120,18 @@ def vectorizeInput(sentences, sentences_t, sentences_t2, sentences_t3, sentences
             #fill time  
             X[i, t+leftpad, len(unique_chars)] = t+1
             X[i, t+leftpad, len(unique_chars)+1] = sentence_t[t]/divisor
-            X[i, t+leftpad, len(unique_chars)+2] = sentence_t2[t]/divisor2
+            #X[i, t+leftpad, len(unique_chars)+2] = sentence_t2[t]/divisor2
             X[i, t+leftpad, len(unique_chars)+3] = sentence_t3[t]/86400
             #fill weekday
             X[i, t+leftpad, len(unique_chars)+3+int(sentence_t4[t])] = 1
+            #fill MA
+            X[i, t+leftpad, len(unique_chars)+3+7+1] = case_MA_1[t]
+            X[i, t+leftpad, len(unique_chars)+3+7+2] = case_MA_2[t]
+            X[i, t+leftpad, len(unique_chars)+3+7+3] = case_MA_3[t]
+            X[i, t+leftpad, len(unique_chars)+3+7+4] = case_MA_4[t]
+            X[i, t+leftpad, len(unique_chars)+3+7+5] = case_MA_5[t]
+            X[i, t+leftpad, len(unique_chars)+3+7+6] = case_MA_6[t]
+
     return X
 
 def getNextActivity(df):

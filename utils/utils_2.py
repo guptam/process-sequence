@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-'''Weekday as categorical variable'''
+'''NO cumduration'''
 
 def transformDf(data):
     '''This function returns a dataframe with the type of activity is a string and the other are float'''
@@ -86,7 +86,7 @@ def vectorizeInput(sentences, sentences_t, sentences_t2, sentences_t3, sentences
             #fill time  
             X[i, t+leftpad, len(unique_chars)] = t+1
             X[i, t+leftpad, len(unique_chars)+1] = sentence_t[t]/divisor
-            X[i, t+leftpad, len(unique_chars)+2] = sentence_t2[t]/divisor2
+            #X[i, t+leftpad, len(unique_chars)+2] = sentence_t2[t]/divisor2
             X[i, t+leftpad, len(unique_chars)+3] = sentence_t3[t]/86400
             #fill weekday
             X[i, t+leftpad, len(unique_chars)+3+int(sentence_t4[t])] = 1
